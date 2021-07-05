@@ -67,7 +67,6 @@ export default defineComponent({
         const {data} = await axios.get<BlockDetail[]>(
           'https://js.adapools.org/blocks.json'
         );
-        console.log('>>> blocks', data);
         blocks.value = data;
 
         emit('updateBlocks', data);
@@ -94,7 +93,6 @@ export default defineComponent({
 
     const onClickPool = (poolId: string) => {
       const pool = getPool(poolId);
-      console.log('>>>', poolId, pool);
       if (!pool) return;
       emit('selectPool', pool);
       worldPoolPointOfView(world, pool);

@@ -1,6 +1,9 @@
 <template>
   <div class="container">
-    <Search v-model:foundPool="foundPool" />
+    <Search
+      v-model:foundPool="foundPool"
+      @showFoundOnly="showFoundOnly = $event"
+    />
     <LabelClick :foundPool="foundPool" />
     <ToggleButtons />
     <Blocks @updateBlocks="blocks = $event" @selectPool="foundPool = $event" />
@@ -9,13 +12,13 @@
 </template>
 
 <script lang="ts">
-import {defineComponent, inject, ref, watch} from 'vue';
+import {defineComponent, inject, nextTick, ref, watch} from 'vue';
 import {GlobeInstance} from 'globe.gl';
 import Search from './Search.vue';
 import LabelClick from './LabelClick.vue';
 import ToggleButtons from './ToggleButtons.vue';
 import Blocks from './Blocks.vue';
-import {mutateWorldData} from '../common';
+import {LABEL_SIZE, mutateWorldData, worldPoolPointOfView} from '../common';
 import {interpolateOranges} from 'd3';
 
 export default defineComponent({
@@ -35,6 +38,7 @@ export default defineComponent({
 
     const foundPool = ref<WorldData | null>(null);
     const blocks = ref<BlockDetail[]>([]);
+    const showFoundOnly = ref(false);
 
     world
       .onLabelClick((e: any) => {
@@ -47,7 +51,7 @@ export default defineComponent({
     const _mutateWorldData = (poolId: string, partial: Partial<WorldData>) =>
       mutateWorldData(data, dataIndexMap, poolId, partial);
 
-    watch(foundPool, (curFoundPool, prevFoundPool) => {
+    watch(foundPool, async (curFoundPool, prevFoundPool) => {
       if (prevFoundPool) {
         const foundPrevPoolBlockIndex = blocks.value.findIndex(
           b => b.pool_id === prevFoundPool.poolId
@@ -62,10 +66,24 @@ export default defineComponent({
       }
       if (curFoundPool) {
         _mutateWorldData(curFoundPool.poolId, {color: '#fb42a7'});
-      }
+        if (showFoundOnly.value) {
+          const _data = data
+            .filter(p => p.poolId === curFoundPool?.poolId)
+            .map(p => ({
+              ...p,
+              level: 0,
+              size: LABEL_SIZE * 2.618,
+              radius: 0.5,
+            }));
 
-      if (prevFoundPool || curFoundPool) {
-        world.labelsData(data);
+          world.labelsData(_data);
+          await nextTick();
+          worldPoolPointOfView(world, _data[0], true);
+        } else {
+          world.labelsData(data);
+          await nextTick();
+          worldPoolPointOfView(world, curFoundPool);
+        }
       }
     });
 
@@ -73,6 +91,8 @@ export default defineComponent({
       interpolateOranges((1 - index / length) / 1.9 + 0.3);
 
     watch(blocks, curBlocks => {
+      if (showFoundOnly.value) return;
+
       curBlocks.forEach((b, i) => {
         const p = data[dataIndexMap[b.pool_id]];
         if (p !== undefined && foundPool.value?.poolId !== p.poolId) {
@@ -84,7 +104,7 @@ export default defineComponent({
       world.labelsData(data);
     });
 
-    return {foundPool, blocks};
+    return {foundPool, blocks, showFoundOnly};
   },
 });
 </script>

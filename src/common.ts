@@ -27,12 +27,18 @@ export const worldDataFromIndex = (data: WorldData[], indexMap: IndexMap) => (
   return data[indexMap[poolId]];
 };
 
-export const worldPoolPointOfView = (world: GlobeInstance, pool: WorldData) => {
+export const worldPoolPointOfView = (
+  world: GlobeInstance,
+  pool: WorldData,
+  isGround: boolean = false
+) => {
+  const cameraDelta = isGround ? 0 : Math.pow(0.9, pool.level);
+  const altitude = isGround ? 0.618 : pool.level + 0.1;
   world.pointOfView(
     {
-      lat: pool.lat - Math.pow(0.9, pool.level),
-      lng: pool.lng - Math.pow(0.9, pool.level),
-      altitude: pool.level + 0.1,
+      lat: pool.lat - cameraDelta,
+      lng: pool.lng - cameraDelta,
+      altitude,
     },
     3000
   );

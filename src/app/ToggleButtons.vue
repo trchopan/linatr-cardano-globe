@@ -7,14 +7,16 @@
 </template>
 
 <script lang="ts">
-import {GlobeInstance} from 'globe.gl';
 import {defineComponent, inject, ref} from 'vue';
+import {GlobeInstance} from 'globe.gl';
 
 export default defineComponent({
   name: 'ToggleButtons',
   setup: () => {
-    const shouldRotate = ref(false);
     const world = inject<GlobeInstance>('world');
+    const shouldRotate = ref(false);
+
+    if (!world) throw new Error('must have world and data');
 
     const toggleAutoRotate = () => {
       shouldRotate.value = !shouldRotate.value;
