@@ -1,0 +1,56 @@
+body {
+  margin: 0;
+}
+
+.pool-tooltip {
+  background: #fefefe;
+  color: black;
+  padding: 0.3rem 0.5rem;
+}
+
+.debug-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  color: white;
+}
+
+a {
+  text-decoration: none;
+  color: unset;
+}
+
+.download-process {
+  background: white;
+  border: solid 2px black;
+  padding: 1rem;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-right: -50%;
+  transform: translate(-50%, -50%);
+}
+
+.author {
+  pointer-events: all;
+  position: absolute;
+  bottom: 0.2rem;
+  left: 50%;
+  margin-right: -50%;
+  transform: translate(-50%, -50%);
+  color: lightgrey;
+  font-family: monospace;
+  font-size: 0.618rem;
+}
+
+.btn-on {
+  background: #fb42a7;
+}
+
+.hide {
+  display: none;
+}
+
+.show {
+  display: block;
+}
