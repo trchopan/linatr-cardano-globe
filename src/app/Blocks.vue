@@ -2,19 +2,25 @@
   <div class="blocks-container">
     <div v-show="showBlocksList" class="block-list">
       <div v-for="(b, i) in blocks" :key="b.slotNo" class="block-row">
-        <div># {{ b.epochNo }}/{{ b.slotNo }}</div>
+        <a :href="blockLink(b)" target="_blank">
+          # {{ b.epochNo }}/{{ b.slotNo }}
+        </a>
         <div
-          class="ticker-link"
+          class="ticker"
           :style="{color: getBlockColor(i, blocks.length)}"
           @click="onClickPool(b.pool_id)"
         >
           <b>{{ getPoolTicker(b.pool_id) }}</b>
         </div>
+        <a
+          :href="linkWithUtm(b.createdByInfo)"
+          target="_blank"
+          class="adapools-link"
+        >
+          <img src="https://adapools.org/images/logo-mini_new-02.svg" alt="" />
+        </a>
         <div>{{ b.createdAt }} UTC</div>
         <div>Txs: {{ b.transactionsCount }}</div>
-        <a :href="linkWithUtm(b.createdByInfo)" target="_blank">
-          link
-        </a>
       </div>
     </div>
     <div class="blocklist-buttons-container">
@@ -101,6 +107,9 @@ export default defineComponent({
     const linkWithUtm = (link: string) =>
       link + '?utm_source=globle.linatr.me&utm_medium=web';
 
+    const blockLink = (block: BlockDetail) =>
+      `https://adapools.org/blocks/${block.id}`;
+
     return {
       blocks,
       autoFetchBlocks,
@@ -111,13 +120,14 @@ export default defineComponent({
       dataIndexMap,
       onClickPool,
       getPoolTicker,
+      blockLink,
       linkWithUtm,
     };
   },
 });
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .blocks-container {
   pointer-events: all;
   grid-area: blocks;
@@ -128,20 +138,33 @@ export default defineComponent({
 
 .block-list {
   max-height: 20rem;
-  overflow-y: scroll;
+  max-width: calc(100vw - 2rem);
+  overflow: scroll;
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 .block-row {
   display: grid;
   grid-gap: 0.5em;
-  grid-template-columns: 5.5rem 4rem 12rem 4.5rem 1.5rem;
+  grid-template-columns: 6rem 4rem 1.5rem 12rem 4.5rem;
   padding: 0.3rem 0.5rem;
   background: black;
   color: #ffaf00;
 }
 
-.ticker-link {
+.ticker {
   cursor: pointer;
+}
+
+.adapools-link {
+  width: 1rem;
+  height: 1rem;
+  filter: grayscale(1);
+  &:hover {
+    filter: grayscale(0);
+  }
 }
 
 .blocklist-buttons-container {
